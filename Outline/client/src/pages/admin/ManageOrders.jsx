@@ -8,23 +8,24 @@ const ManageOrders = () => {
   const { token } = useAuth(); // assuming you store the JWT here
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get('/api/admin/orders', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setOrders(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch orders', err);
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/orders/admin-orders', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setOrders(data);
+    } catch (err) {
+      console.error('Failed to load orders');
+    }
+  };
 
-    fetchOrders();
-  }, [token]);
+  fetchOrders();
+}, []);
+
 
   const handleStatusChange = async (orderId, status) => {
     try {

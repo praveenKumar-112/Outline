@@ -1,8 +1,9 @@
-// server/middleware/admin.js
-
-export default function admin(req, res, next) {
-  if (!req.user || !req.user.isAdmin) {
-    return res.status(403).json({ message: 'Access denied. Admins only.' });
+const admin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(403).json({ error: 'Admin access only' });
   }
-  next();
-}
+};
+
+export default admin;
