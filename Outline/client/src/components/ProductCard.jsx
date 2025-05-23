@@ -1,25 +1,19 @@
-import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart'; // ✅ path might differ
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useCart();
+  const { addToCart } = useCart(); // ✅ this will fail if CartProvider isn't wrapped
 
   return (
     <div className="product-card">
-      <Link to={`/product/${product._id}`}>
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{ width: '100%', cursor: 'pointer', height: '200px', objectFit: 'cover' }}
-        />
-        <h6 className="mt-2">{product.name}</h6>
-        <p>₹{product.price}</p>
-      </Link>
-
-      <button
-        className="btn btn-dark mt-2"
-        onClick={() => addToCart(product)}
-      >
+      <img
+        src={product.imageUrl || product.image}
+        alt={product.name}
+        onClick={() => window.location.href = `/product/${product._id}`}
+        style={{ cursor: 'pointer', width: '100%' }}
+      />
+      <h6 className="mt-2">{product.name}</h6>
+      <p>${product.price}</p>
+      <button onClick={() => addToCart(product)} className="btn btn-dark mt-2">
         Add to Cart
       </button>
     </div>

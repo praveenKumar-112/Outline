@@ -1,32 +1,48 @@
-import { useCart } from '../context/CartContext';
+import React from 'react';
+import { useCart } from '../hooks/useCart';
 
 const Cart = () => {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cartItems, removeFromCart } = useCart();
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
 
-  if (cart.length === 0) {
-    return <h3>Your cart is empty.</h3>;
-  }
+  const handleCheckout = () => {
+    alert('Order placed successfully!');
+    // Here you can later call an API to save the order
+  };
 
   return (
-    <div className="container">
-      <h3>Your Cart</h3>
-      <ul className="list-group mb-3">
-        {cart.map(item => (
-          <li key={item._id} className="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <h6>{item.name}</h6>
-              <p className="mb-0">Quantity: {item.quantity}</p>
-              <p className="mb-0">Price: ₹{item.price}</p>
-            </div>
-            <button className="btn btn-danger btn-sm" onClick={() => removeFromCart(item._id)}>Remove</button>
-          </li>
-        ))}
-      </ul>
-      <h5>Total: ₹{total.toFixed(2)}</h5>
-      <button className="btn btn-primary">Proceed to Checkout</button>
-      <button className="btn btn-outline-danger ms-2" onClick={clearCart}>Clear Cart</button>
+    <div className="container mt-5 pt-5">
+      <h2>Your Cart</h2>
+
+      {cartItems.length === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <>
+          <ul className="list-group mb-3">
+            {cartItems.map((item) => (
+              <li key={item._id} className="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h5>{item.name}</h5>
+                  <p>${item.price.toFixed(2)}</p>
+                </div>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeFromCart(item._id)}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <h4>Total: ${totalPrice.toFixed(2)}</h4>
+
+          <button className="btn btn-primary mt-3" onClick={handleCheckout}>
+            Place Order
+          </button>
+        </>
+      )}
     </div>
   );
 };
