@@ -1,0 +1,75 @@
+.navbar-full {
+  width: 100vw; /* Full viewport width */
+  background-color: white;
+  padding: 10px 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  margin: 0;
+}
+
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  flex: 1;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navbar-brand a {
+  text-decoration: none;
+  color: black;
+}
+
+.navbar-links {
+  flex: 2;
+  display: flex;
+  /* justify-content: center; */
+  gap: 30px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.navbar-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+
+.cart-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+}
+
+.cart-count {
+  margin-left: 4px;
+  font-weight: bold;
+  background: black;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.navbar {
+  min-height: 50px; /* or whatever height you want */
+  background-color: white !important;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+
