@@ -21,7 +21,7 @@ const App = () => {
   return (
     <>
       <Navbar />
-      <div className="container mt-4">
+      <main className="main-content" role="main">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -34,17 +34,16 @@ const App = () => {
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
 
-          {/* ✅ Admin-only Routes */}
+          {/* Admin-only Routes */}
           <Route path="/admin/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
           <Route path="/admin/manage-products" element={<AdminRoute><ManageProducts /></AdminRoute>} />
           <Route path="/admin/manage-products/:id" element={<AdminRoute><EditProduct /></AdminRoute>} />
-
           <Route path="/admin/orders" element={<AdminRoute><ManageOrders /></AdminRoute>} />
 
           {/* 404 fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </div>
+      </main>
       <Footer />
     </>
   );
