@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Express API for your e-commerce
+
+Parameters:
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: "Frontend origin for CORS (e.g., https://d123.cloudfront.net)"
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 15
+    MemorySize: 512
+    Architectures: [x86_64]
+    Environment:
+      Variables:
+        MONGO_URI: ""
+        JWT_SECRET: ""
+        CLOUDINARY_CLOUD_NAME: ""
+        CLOUDINARY_API_KEY: ""
+        CLOUDINARY_API_SECRET: ""
+        ALLOWED_ORIGIN: !Ref AllowedOrigin
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+      FailOnWarnings: true
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: handler.handler
+      Events:
+        AnyRoute:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Description: "HTTP API base URL"
+  

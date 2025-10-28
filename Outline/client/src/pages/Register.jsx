@@ -1,6 +1,6 @@
 // client/src/pages/Register.jsx
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios.js';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -20,7 +20,6 @@ const Register = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          withCredentials: true,
         }
       );
 

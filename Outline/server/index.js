@@ -5,19 +5,19 @@ import app from "./app.js";
 
 dotenv.config();
 
-let isConnected = false; // Track Mongo connection
+let isConnected = false;
 
 async function connectToDatabase() {
   if (!isConnected) {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB connected");
+    console.log("✅ MongoDB connected");
     isConnected = true;
   }
 }
 
 export const handler = async (event, context) => {
-  context.callbackWaitsForEmptyEventLoop = false; // Reuse DB connection
+  context.callbackWaitsForEmptyEventLoop = false;
   await connectToDatabase();
-  const handler = serverless(app);
-  return handler(event, context);
+  const expressHandler = serverless(app);
+  return expressHandler(event, context);
 };

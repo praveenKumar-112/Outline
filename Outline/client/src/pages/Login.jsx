@@ -1,6 +1,6 @@
 // client/src/pages/Login.jsx
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios.js';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {

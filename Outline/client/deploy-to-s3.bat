@@ -1,0 +1,6 @@
+@echo off
+echo Building frontend...
+npm run build
+echo Uploading to S3...
+aws s3 sync dist/ s3://frontend-deployment-outline --delete
+echo Deployment complete!
