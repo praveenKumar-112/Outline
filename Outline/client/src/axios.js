@@ -1,11 +1,10 @@
-// src/axios.js
 import axios from "axios";
 
-// Use local server for development and production
+// Use localhost instead of backend for browser access
 const baseURL = "http://localhost:5000";
 
 const instance = axios.create({
-  baseURL: baseURL,
+  baseURL,
   withCredentials: false,
 });
 

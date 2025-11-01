@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outline-backend
+  namespace: outline-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outline-backend
+  template:
+    metadata:
+      labels:
+        app: outline-backend
+    spec:
+      containers:
+        - name: outline-backend
+          image: 484395054942.dkr.ecr.ap-south-1.amazonaws.com/outline-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGO_URI
+              value: "mongodb+srv://kasireddypraveen2:Praveen%401122@outline-cluster.ip9ebjc.mongodb.net/?retryWrites=true&w=majority&appName=Outline-cluster"
+            - name: JWT_SECRET
+              value: "30dc24f91d6847936f1d86e215d7da462b35045d786348f9f6fb5aa96e60b6bec6a9cf50a48f716fb4699f820126c99343e2dbbe6b9fe72cc38018989205a767"
+            - name: PORT
+              value: "5000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: outline-backend
+  namespace: outline-app
+spec:
+  selector:
+    app: outline-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP

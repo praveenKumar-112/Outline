@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outline-frontend
+  namespace: outline-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outline-frontend
+  template:
+    metadata:
+      labels:
+        app: outline-frontend
+    spec:
+      containers:
+        - name: outline-frontend
+          image: 484395054942.dkr.ecr.ap-south-1.amazonaws.com/outline-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: REACT_APP_API_URL
+              value: "http://outline-backend:5000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: outline-frontend
+  namespace: outline-app
+spec:
+  selector:
+    app: outline-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30000
+  type: LoadBalancer

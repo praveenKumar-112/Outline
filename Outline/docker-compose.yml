@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: 484395054942.dkr.ecr.ap-south-1.amazonaws.com/mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - outline-network
+
+  outline-backend:
+    image: 484395054942.dkr.ecr.ap-south-1.amazonaws.com/outline-backend:latest
+    container_name: outline-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    environment:
+      - MONGO_URI=mongodb+srv://kasireddypraveen2:Praveen%401122@outline-cluster.ip9ebjc.mongodb.net/?retryWrites=true&w=majority&appName=Outline-cluster
+      - PORT=5000
+      - NODE_ENV=production
+    depends_on:
+      - mongo
+    networks:
+      - outline-network
+
+  outline-frontend:
+    image: 484395054942.dkr.ecr.ap-south-1.amazonaws.com/outline-frontend:latest
+    container_name: outline-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://outline-backend:5000
+    depends_on:
+      - outline-backend
+    networks:
+      - outline-network
+
+volumes:
+  mongo_data:
+
+networks:
+  outline-network:
+    driver: bridge
