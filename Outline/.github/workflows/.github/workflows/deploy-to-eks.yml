@@ -1,0 +1,78 @@
+name: CI/CD -> ECR -> EKS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+  K8S_NAMESPACE: ${{ secrets.K8S_NAMESPACE || 'outline-app' }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set image tags
+      id: vars
+      run: |
+        IMAGE_TAG=${GITHUB_SHA::8}
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Build frontend image
+      run: |
+        docker build -t $ECR_REGISTRY/outline-frontend:${{ steps.vars.outputs.IMAGE_TAG }} ./client
+        docker tag $ECR_REGISTRY/outline-frontend:${{ steps.vars.outputs.IMAGE_TAG }} $ECR_REGISTRY/outline-frontend:latest
+
+    - name: Build backend image
+      run: |
+        docker build -t $ECR_REGISTRY/outline-backend:${{ steps.vars.outputs.IMAGE_TAG }} ./server
+        docker tag $ECR_REGISTRY/outline-backend:${{ steps.vars.outputs.IMAGE_TAG }} $ECR_REGISTRY/outline-backend:latest
+
+    - name: Push frontend image to ECR
+      run: |
+        docker push $ECR_REGISTRY/outline-frontend:${{ steps.vars.outputs.IMAGE_TAG }}
+        docker push $ECR_REGISTRY/outline-frontend:latest
+
+    - name: Push backend image to ECR
+      run: |
+        docker push $ECR_REGISTRY/outline-backend:${{ steps.vars.outputs.IMAGE_TAG }}
+        docker push $ECR_REGISTRY/outline-backend:latest
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+    - name: Deploy - set new images
+      run: |
+        # Set deployment images to the newly pushed images with short SHA tag
+        kubectl -n ${K8S_NAMESPACE} set image deployment/outline-frontend outline-frontend=$ECR_REGISTRY/outline-frontend:${{ steps.vars.outputs.IMAGE_TAG }}
+        kubectl -n ${K8S_NAMESPACE} set image deployment/outline-backend outline-backend=$ECR_REGISTRY/outline-backend:${{ steps.vars.outputs.IMAGE_TAG }}
+        # Optionally wait for rollout to finish
+        kubectl -n ${K8S_NAMESPACE} rollout status deployment/outline-frontend --timeout=120s
+        kubectl -n ${K8S_NAMESPACE} rollout status deployment/outline-backend --timeout=120s
+
+    - name: Get pods
+      run: kubectl get pods -n ${K8S_NAMESPACE}
